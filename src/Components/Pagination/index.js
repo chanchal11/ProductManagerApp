@@ -18,21 +18,24 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 500,
   },
   gridContainer: {
-    paddingLeft: "40px",
-    paddingRight: "40px",
-    paddingTop: "40px"
+    // paddingLeft: "15px",
+    // paddingRight: "15px",
+    // paddingTop: "40px"
+    padding: '2% 5% 2% 5%'
+  },
+  pagination: {
+    display: 'contents' ,
+    alignItems: 'center'
   }
 }));
 
 export default function CustomPaginationActionsTable() {
   const classes = useStyles();
   const [page, setPage] = React.useState(1);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const dispatch = useDispatch();
   const products = useSelector((state) => state.ProductDetailReducer.products);
   const loading = useSelector((state) => state.ProductDetailReducer.loading);
   const searchItems = useSelector((state) => state.ProductDetailReducer.search);
-  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, products.data.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -54,7 +57,7 @@ export default function CustomPaginationActionsTable() {
     <center className={classes.root}>
           <Grid
            container
-           spacing={4}
+           spacing={2}
             className={classes.gridContainer}
            justify="center" >
           {!loading ? products.data.map((row) => 
@@ -68,8 +71,8 @@ export default function CustomPaginationActionsTable() {
                 />
               </Grid>
           ) : <div>Loading ...</div> }
-            <Grid item xs={12} sm={12} md={12} key={uuidv4()} >
-               <Pagination count={products.totalPages} page={page} onChange={handleChangePage} />
+            <Grid item xs={12} sm={12} md={12} key={uuidv4()} className={classes.pagination} >
+               <Pagination count={products.totalPages} page={page} onChange={handleChangePage}  />
             </Grid>
           </Grid>
                              

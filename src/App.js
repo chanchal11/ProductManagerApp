@@ -2,8 +2,8 @@ import {useEffect} from 'react';
 import { useDispatch } from 'react-redux';
 import logo from './logo.svg';
 import './App.css';
-import Pagination from './Components/Pagination';
 import {getProductDetailsAPI } from './API';
+import Home from './Pages/Home';
  
 function App() {
 
@@ -24,8 +24,8 @@ function App() {
   },[]);
 
   return ( 
-      <div >
-        <Pagination  />
+      <div style={{overflowX: 'hidden', overflowY: 'hidden'}}>
+        <Home />
      </div>
   );
 }
