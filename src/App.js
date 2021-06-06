@@ -1,24 +1,32 @@
+import {useEffect} from 'react';
+import { useDispatch } from 'react-redux';
 import logo from './logo.svg';
 import './App.css';
-
+import Pagination from './Components/Pagination';
+import {getProductDetailsAPI } from './API';
+ 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch({ type: "PRODUCT_SET_LOADING" });
+    getProductDetailsAPI().then((result)=> {
+
+        if(result.status == 200){
+            dispatch({ type: "PRODUCT_ADD", payload: result.data });
+            dispatch({ type: "PRODUCT_RESET_LOADING" });
+        }
+        dispatch({ type: "PRODUCT_RESET_LOADING" });
+    }).catch((error)=>{
+      dispatch({ type: "PRODUCT_RESET_LOADING" });
+    });
+  },[]);
+
+  return ( 
+      <div >
+        <Pagination  />
+     </div>
   );
 }
 
