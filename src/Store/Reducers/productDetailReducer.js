@@ -1,5 +1,5 @@
 const initialState = { 
-    products: {data: [], limit: 5, currentPage: 1, total: 0, totalPages: 0}, 
+    products: {data: [], limit: 6, currentPage: 1, total: 0, totalPages: 0}, 
     loading: true,
     search: {
         currentSearchString: '',
@@ -10,7 +10,7 @@ const initialState = {
 
 export default function productDetailReducer(state = initialState, action) {
   switch (action.type) {
-    case "PRODUCT_ADD":
+    case "PRODUCT_SET_RESULTS":
         const {data,previousPage, currentPage, nextPage, total, totalPages, limit } = action.payload;
         return {
             ...state, products: {data,previousPage, currentPage, nextPage, total, totalPages, limit}

@@ -12,10 +12,15 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-export default function AddButton(){
+export default function AddButton(props){
     const classes = useStyles();
 
-    return (<Fab aria-label={'Add'} className={classes.fab} color={'primary'} size={'large'} >
+    return (<Fab 
+                aria-label={'Add'} 
+                className={classes.fab} 
+                color={'primary'} 
+                size={'large'}
+                onClick={props.showForm} >
             <AddIcon/>
         </Fab>);
 }

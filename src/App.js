@@ -14,13 +14,14 @@ function App() {
     getProductDetailsAPI().then((result)=> {
 
         if(result.status == 200){
-            dispatch({ type: "PRODUCT_ADD", payload: result.data });
+            dispatch({ type: "PRODUCT_SET_RESULTS", payload: result.data });
             dispatch({ type: "PRODUCT_RESET_LOADING" });
         }
         dispatch({ type: "PRODUCT_RESET_LOADING" });
-    }).catch((error)=>{
-      dispatch({ type: "PRODUCT_RESET_LOADING" });
-    });
+        }).catch((error)=>{
+          dispatch({ type: "PRODUCT_RESET_LOADING" });
+        });
+        
   },[]);
 
   return ( 

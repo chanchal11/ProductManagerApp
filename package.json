@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
     "google-map-react": "1.1.4",
+    "lodash": "^4.17.21",
     "material-ui-slider": "3.0.8",
     "pure-react-carousel": "1.21.1",
     "react": "^17.0.2",

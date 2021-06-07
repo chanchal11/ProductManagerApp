@@ -40,11 +40,11 @@ export default function CustomPaginationActionsTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     dispatch({ type: "PRODUCT_SET_LOADING" });
-    console.log('newpage=',newPage);
+    // console.log('newpage=',newPage);
     getProductDetailsAPI(searchItems.lastSearchString,newPage, products.limit).then((result)=> {
 
         if(result.status == 200){
-            dispatch({ type: "PRODUCT_ADD", payload: result.data });
+            dispatch({ type: "PRODUCT_SET_RESULTS", payload: result.data });
             dispatch({ type: "PRODUCT_RESET_LOADING" });
         }
         dispatch({ type: "PRODUCT_RESET_LOADING" });
@@ -68,12 +68,13 @@ export default function CustomPaginationActionsTable() {
                     description={row.description}
                     categoryName={row.categoryId && row.category.name ? row.category.name : '' }
                     expiryDate={row.expiryDate}
+                    image={row.categoryId && row.category.image ? row.category.image : '' }
                 />
               </Grid>
-          ) : <div>Loading ...</div> }
-            <Grid item xs={12} sm={12} md={12} key={uuidv4()} className={classes.pagination} >
+          ) : <div></div> }
+            {!loading ? <Grid item xs={12} sm={12} md={12} key={uuidv4()} className={classes.pagination} >
                <Pagination count={products.totalPages} page={page} onChange={handleChangePage}  />
-            </Grid>
+            </Grid>: <div/>}
           </Grid>
                              
     </center>

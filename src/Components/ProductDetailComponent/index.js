@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
 });
 
-export function ProductDetailComponent() {
+export function ProductDetailComponent(props) {
   const classes = useStyles();
 
   return (
@@ -27,16 +27,15 @@ export function ProductDetailComponent() {
           component="img"
           alt="Products"
           height="140"
-          image="https://www.bpimaging.com/assets/uploads/2015/02/11897_096.jpg"
+          image={props.image}
           title="Contemplative Reptile"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            Lizard
+            {props.name}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-            across all continents except Antarctica
+            {props.description}
           </Typography>
         </CardContent>
       </CardActionArea>
