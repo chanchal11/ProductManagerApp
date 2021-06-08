@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -15,7 +15,7 @@ import Link from '@material-ui/core/Link';
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProductAPI } from '../../API';
+import { addProductAPI, updateProductAPI } from '../../API';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -35,8 +35,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Form(props) {
   const classes = useStyles();
+  
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.ProductDetailReducer.loading);
+  const products = useSelector((state) => state.ProductDetailReducer.products);
+  const edit = useSelector((state) => state.ProductDetailReducer.edit);  
+  
+  const productToBeEdited = edit.isEdit ? products.data[edit.editIndex]: {id:-1,"name":'',description:'',price:'',expiryDate:'',categoryId:-1,category:{id:-1,name:'',image:''}};  
   const [productName,setProductName] = useState('');
   const [description,setDescription] = useState('');
   const [category,setCategory] = useState('');
@@ -44,10 +49,22 @@ export default function Form(props) {
   const [price,setPrice] = useState('');  
   const [expiryDate,setExpiryDate] = useState('');  
   const [error,setError] = useState({productName:'',category:'',categoryImage: '',price: '',description: '', expiryDate: ''});
-  const [showWarning,setShowWarning] = useState(false);
+  const [loadProduct,setLoadProduct] = useState(true);
   const [warningMsg,setWarningMsg] = useState('');
-  const [showSuccessMsg,setShowSuccessMsg] = useState(false);
   const [successMsg,setSuccessMsg] = useState('');
+  
+  const setStateIfRequired = () => {
+    if(!productName) setProductName(productToBeEdited.name);
+    if(!description) setDescription(productToBeEdited.description);
+    if(!category) setCategory(productToBeEdited.category.name);
+    if(!categoryImage) setCategoryImage(productToBeEdited.category.image);
+    if(!price) setPrice(productToBeEdited.price.toString());
+    if(!expiryDate) setExpiryDate(productToBeEdited.expiryDate);
+  }
+  
+  useEffect(()=>{
+    if(loadProduct) setStateIfRequired();
+  });
 
   const resetForm = () => {
       setProductName('');
@@ -63,7 +80,8 @@ export default function Form(props) {
     resetForm();
     setWarningMsg('');
     setSuccessMsg('');
-    props.setOpenFrom(false);
+    setLoadProduct(true);
+    dispatch({type: 'EDITADD_MODAL', payload: {editIndex:-1,isEdit:false,showEditModal:false}  });
   };
 
   const handleCloseAlert = (event, reason) => {
@@ -102,24 +120,60 @@ export default function Form(props) {
     return Object.values(temp).every(x => x == "");
  }
 
- const addProduct = () => {
+ const onTextChange = (e,callback) => {
+    setLoadProduct(false);
+    callback(e.currentTarget.value);
+ }
+
+ const processFetchedResponse = (result) => {
+    if(result.status == 200){
+        dispatch({ type: "PRODUCT_RESET_LOADING" });
+        if(!edit.isEdit) resetForm();
+        dispatch({
+          type: "AFTER_EDITADD_MODAL",
+          payload: {
+              data: {
+                  id: productToBeEdited.id,
+                  "name": productName,
+                  price:parseInt(price),
+                  expiryDate,
+                  description,
+                  category: {
+                      id: -1,
+                      "name": category,
+                      image: categoryImage ? categoryImage : products.data[edit.editIndex].category.image
+                  }
+              }
+          }
+      });
+        setSuccessMsg('Successfully Saved');
+    }
+
+   dispatch({ type: "PRODUCT_RESET_LOADING" });
+ }
+
+ const onClickHandler = () => {
+    setStateIfRequired();
     if(!dataValidation())
         return;
     setWarningMsg('');
     setSuccessMsg('');
     dispatch({ type: "PRODUCT_SET_LOADING" });
-    addProductAPI(productName,description,price,expiryDate,category,categoryImage).then((result)=>{
-        
-        if(result.status == 200){
-            dispatch({ type: "PRODUCT_RESET_LOADING" });
-            resetForm();
-            setSuccessMsg('Successfully Saved');
-        }
-        dispatch({ type: "PRODUCT_RESET_LOADING" });
-        }).catch((error)=>{
-          dispatch({ type: "PRODUCT_RESET_LOADING" });
-          setWarningMsg('Bad Input');  
+    if(!edit.isEdit){
+        addProductAPI(productName,description,price,expiryDate,category,categoryImage).then((result)=>{
+            processFetchedResponse(result);
+            }).catch((error)=>{
+              dispatch({ type: "PRODUCT_RESET_LOADING" });
+              setWarningMsg('Bad Input');  
         });
+    }else{
+        updateProductAPI(productName,description,price,expiryDate,category,categoryImage,productToBeEdited.id).then((result)=>{
+            processFetchedResponse(result);
+            }).catch((error)=>{
+              dispatch({ type: "PRODUCT_RESET_LOADING" });
+              setWarningMsg('Bad Input');  
+        });
+    }
  }
 
   return (
@@ -127,11 +181,11 @@ export default function Form(props) {
       <Dialog
         // fullWidth={fullWidth}
         // maxWidth={maxWidth}
-        open={props.openForm}
+        open={edit.showEditModal}
         onClose={handleCloseModal}
         aria-labelledby="max-width-dialog-title"
       >
-        <DialogTitle id="max-width-dialog-title">Add a product</DialogTitle>
+        <DialogTitle id="max-width-dialog-title">{edit.isEdit ? "Edit a product detail": "Add a product"}</DialogTitle>
         {warningMsg ? <Snackbar open={warningMsg} autoHideDuration={3000} onClose={handleCloseAlert} elevation={6} variant="filled" >
                 <Alert onClose={handleCloseAlert} severity="warning">
                     {warningMsg}
@@ -145,7 +199,7 @@ export default function Form(props) {
             </Snackbar> : <React.Fragment/> }
         <DialogContent>
           <DialogContentText>
-            To add a new product, please fill the information and hit Save button.
+            To add/edit a new product, please fill the information and hit Save button.
           </DialogContentText>
           <form className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -159,8 +213,8 @@ export default function Form(props) {
                     name="productName"
                     autoComplete="productName"
                     autoFocus
-                    onChange={(e)=>setProductName(e.currentTarget.value)}
-                    value={productName}
+                    onChange={(e)=> onTextChange(e,setProductName) }
+                       value={ loadProduct ? productToBeEdited.name : productName }
                     {...(error.productName && {error:true,helperText:error.productName})}
                 />
                 </Grid>
@@ -175,8 +229,8 @@ export default function Form(props) {
                     label="Description"
                     name="description"
                     autoComplete="description"
-                    value={description}
-                    onChange={(e)=>setDescription(e.currentTarget.value)}
+                    value={ loadProduct ? productToBeEdited.description : description }
+                    onChange={(e)=>onTextChange(e,setDescription)}
                     {...(error.description && {error:true,helperText:error.description})}
                 />
                 </Grid>
@@ -189,8 +243,8 @@ export default function Form(props) {
                     fullWidth
                     id="category"
                     label="Category"
-                    value={category}
-                    onChange={(e)=>setCategory(e.currentTarget.value)}
+                    value={ loadProduct ? productToBeEdited.category.name : category }
+                    onChange={(e)=>onTextChange(e,setCategory)}
                     {...(error.category && {error:true,helperText:error.category})}
                 />
                 </Grid>
@@ -201,8 +255,8 @@ export default function Form(props) {
                     id="categoryImage"
                     label="Category Image Link"
                     name="categoryImage"
-                    value={categoryImage}
-                    onChange={(e)=>setCategoryImage(e.currentTarget.value)}
+                    value={ loadProduct ? productToBeEdited.category.image : categoryImage }
+                    onChange={(e)=>onTextChange(e,setCategoryImage)}
                     {...(error.categoryImage && {error:true,helperText:error.categoryImage})}
                 />
                 </Grid>
@@ -216,8 +270,8 @@ export default function Form(props) {
                     id="productPrice"
                     label="Price"
                     name="productPrice"
-                    onChange={(e)=>setPrice(e.currentTarget.value)}
-                    value={price}
+                    onChange={(e)=>onTextChange(e,setPrice)}
+                    value={ loadProduct ? productToBeEdited.price : price }
                     {...(error.price && {error:true,helperText:error.price})}
                 />
                 </Grid>
@@ -229,15 +283,15 @@ export default function Form(props) {
                     type="date"
                     id="expiryDate"
                     name="expiryDate"
-                    onChange={(e)=>setExpiryDate(e.currentTarget.value)}
-                    value={expiryDate}
+                    onChange={(e)=>onTextChange(e,setExpiryDate)}
+                    value={ loadProduct ? productToBeEdited.expiryDate : expiryDate }
                     {...(error.expiryDate && {error:true,helperText:error.expiryDate})}
                 />
                 </Grid>
                 <Grid item xs={12}>
                     <Button
                     // type="submit"
-                    onClick={addProduct}
+                    onClick={onClickHandler}
                     disabled={loading}
                     fullWidth
                     variant="contained"

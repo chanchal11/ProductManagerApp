@@ -60,15 +60,18 @@ export default function CustomPaginationActionsTable() {
            spacing={2}
             className={classes.gridContainer}
            justify="center" >
-          {!loading ? products.data.map((row) => 
+          {!loading ? products.data.map((row,index) => 
              
                 <Grid item xs={12} sm={6} md={4} key={uuidv4()} >
-                  <ProductDetailComponent 
+                  <ProductDetailComponent
+                    productIndex={index}  
                     name={row.name} 
                     description={row.description}
-                    categoryName={row.categoryId && row.category.name ? row.category.name : '' }
+                    // categoryName={row.categoryId && row.category.name ? row.category.name : '' }
                     expiryDate={row.expiryDate}
-                    image={row.categoryId && row.category.image ? row.category.image : '' }
+                    // image={row.categoryId && row.category.image ? row.category.image : '' }
+                    category={row.category}
+                    price={row.price}
                 />
               </Grid>
           ) : <div></div> }

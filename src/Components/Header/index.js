@@ -81,7 +81,7 @@ export default function SearchAppBar() {
       dispatch({ type: "PRODUCT_SET_LOADING" });
       dispatch({ type: "PRODUCT_SET_LAST_SEARCH", payload: {lastSearchString: searchTerm } });
       getProductDetailsAPI(searchTerm,1, products.limit).then((result)=> {
-          console.log(searchTerm,result.data);
+          //console.log(searchTerm,result.data);
           if(result.status == 200){
               dispatch({ type: "PRODUCT_SET_RESULTS", payload: result.data });
               dispatch({ type: "PRODUCT_RESET_LOADING" });
@@ -90,13 +90,15 @@ export default function SearchAppBar() {
       }).catch((error)=>{
         dispatch({ type: "PRODUCT_RESET_LOADING" });
       });
-    }, 1000)
+    }, 500)
   );
 
   useEffect(
     () => {
       if (searchTerm) {
         debounceSearch.current(searchTerm);
+      }else{
+        debounceSearch.current('');
       }
     },
     [searchTerm]
