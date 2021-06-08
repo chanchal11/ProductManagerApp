@@ -107,9 +107,9 @@ export default function Form(props) {
     if(!category){
       temp.category = "Category is required.";
     }
-    // if(!categoryImage){
-    //   temp.categoryImage = "Image is required.";
-    // }
+    if(!edit.isEdit && !categoryImage){
+      temp.categoryImage = "Image is required if adding a new product.";
+    }
     if(!price){
       temp.price = "Price is required.";
     }
