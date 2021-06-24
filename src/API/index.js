@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const UrlRoot = 'http://localhost:5000';
+const UrlRoot = 'https://product-manager-api-in.herokuapp.com';
 
 const addProductAPI = (name, description, price, expiryDate, categoryName,image="") => axios.post(`${UrlRoot}/api/product`,{name, description, price, expiryDate, categoryName, image});
 
