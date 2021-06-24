@@ -1,22 +1,35 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Card, IconButton }from '@material-ui/core';
+import { Card, IconButton } from '@material-ui/core';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import {Edit, Delete, ShoppingCart} from '@material-ui/icons';
+import { Edit, Delete, ShoppingCart } from '@material-ui/icons';
 import { Grid } from "@material-ui/core";
 import { useDispatch, useSelector } from 'react-redux';
 
 const useStyles = makeStyles({
+  // root: {
+  //   maxWidth: 400
+  //   marginLeft: '10%',
+  //   marginRight: '10%'
+  // },
   root: {
-    // maxWidth: 400
-    // marginLeft: '10%',
-    // marginRight: '10%'
+    display: "flex"
   },
+  details: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  content: {
+    flex: "0 0 auto"
+  },
+  cover: {
+    objectFit: 'cover'
+  }
 });
 
 export function ProductDetailComponent(props) {
@@ -33,7 +46,7 @@ export function ProductDetailComponent(props) {
   }
 
   const openEditModal = () => {
-    dispatch({type: 'EDITADD_MODAL', payload: {editIndex: props.productIndex,isEdit:true,showEditModal:true}  });
+    dispatch({ type: 'EDITADD_MODAL', payload: { editIndex: props.productIndex, isEdit: true, showEditModal: true } });
   }
 
   // const openDeleteModal = () => {
@@ -42,25 +55,28 @@ export function ProductDetailComponent(props) {
 
   return (
     <Card className={classes.root} onMouseOver={showActionButtons} onMouseLeave={hideActionButtons} >
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          alt="Products"
-          height="140"
-          image={props.category.image}
-          title={props.category.name}
-        />
+      <CardMedia
+        component="img"
+        alt="Products"
+        height="140"
+        width="80"
+        className={classes.cover}
+        image={props.category.image}
+        title={props.category.name}
+      />
+    <div className={classes.details} >
+    <CardActionArea>
         <CardContent>
           <Grid container >
             <Grid item xs={6}  >
-            <Typography gutterBottom variant="h5" component="h2">
-            {props.name}
-          </Typography>
+              <Typography gutterBottom variant="h5" component="h2">
+                {props.name}
+              </Typography>
             </Grid>
-            <Grid item xs={6} style={{paddingTop: 5}} >
-              <Typography  component="h4">
-              INR {props.price}
-            </Typography>
+            <Grid item xs={6} style={{ paddingTop: 5 }} >
+              <Typography component="h4">
+                INR {props.price}
+              </Typography>
             </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="p">
@@ -68,15 +84,16 @@ export function ProductDetailComponent(props) {
           </Typography>
         </CardContent>
       </CardActionArea>
-      {showActions && 
-       (<CardActions>
+      {showActions &&
+        (<CardActions>
           <IconButton aria-label="edit" onClick={openEditModal} >
-                <Edit color="primary" />
-            </IconButton>
-            <IconButton aria-label="delete" >
-                <Delete color="secondary" />
-            </IconButton>
-      </CardActions>)}
+            <Edit color="primary" />
+          </IconButton>
+          <IconButton aria-label="delete" >
+            <Delete color="secondary" />
+          </IconButton>
+        </CardActions>)}
+    </div>
     </Card>
   );
 }
